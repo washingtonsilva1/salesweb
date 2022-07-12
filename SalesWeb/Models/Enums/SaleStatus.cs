@@ -3,8 +3,8 @@ namespace SalesWeb.Models.Enums
 {
     public enum SaleStatus : int
     {
-        PENDING,
-        BILLED,
-        CANCELED
+        Pending,
+        Billed,
+        Canceled
     }
 }
