@@ -35,7 +35,15 @@ namespace SalesWeb.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Seller seller)
         {
+            if (!ModelState.IsValid)
+            {
+                ICollection<Department> dps = _departmentService.FindAll();
+                SellerFormViewModel sfm = new SellerFormViewModel { Seller = seller, Departments = dps };
+                return View(sfm);
+            }
+
             _sellerService.Insert(seller);
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -84,9 +92,9 @@ namespace SalesWeb.Controllers
                 return RedirectToAction(nameof(Error), new { message = "Id not found" });
 
             ICollection<Department> departments = _departmentService.FindAll();
-            
+
             SellerFormViewModel sfm = new SellerFormViewModel { Seller = seller, Departments = departments };
-            
+
             return View(sfm);
         }
 
@@ -94,6 +102,13 @@ namespace SalesWeb.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, Seller seller)
         {
+            if (!ModelState.IsValid)
+            {
+                ICollection<Department> dps = _departmentService.FindAll();
+                SellerFormViewModel sfm = new SellerFormViewModel { Seller = seller, Departments = dps };
+                return View(sfm);
+            }
+
             if (id != seller.Id)
                 return RedirectToAction(nameof(Error), new { message = "Id mismatch" });
 
@@ -103,11 +118,11 @@ namespace SalesWeb.Controllers
 
                 return RedirectToAction(nameof(Index));
             }
-            catch(NotFoundException e)
+            catch (NotFoundException e)
             {
                 return RedirectToAction(nameof(Error), new { message = e.Message });
             }
-            catch(DbConcurrencyException e)
+            catch (DbConcurrencyException e)
             {
                 return RedirectToAction(nameof(Error), new { message = e.Message });
             }
