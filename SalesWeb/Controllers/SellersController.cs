@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SalesWeb.Services;
+using SalesWeb.Models;
 
 namespace SalesWeb.Controllers
 {
@@ -19,6 +20,19 @@ namespace SalesWeb.Controllers
         public IActionResult Index()
         {
             return View(_sellerservice.FindAll());
+        }
+
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost] // Indica que é um método do tipo POST.
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(Seller seller)
+        {
+            _sellerservice.Insert(seller);
+            return RedirectToAction(nameof(Index));
         }
     }
 }
