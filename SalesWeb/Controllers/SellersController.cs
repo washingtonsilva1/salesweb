@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SalesWeb.Services;
 using SalesWeb.Models;
 using SalesWeb.Models.ViewModels;
+using SalesWeb.Services.Exceptions;
 
 namespace SalesWeb.Controllers
 {
@@ -69,6 +70,46 @@ namespace SalesWeb.Controllers
                 return NotFound();
 
             return View(seller);
+        }
+
+        public IActionResult Edit(int? id)
+        {
+            if (id == null)
+                return NotFound();
+
+            var seller = _sellerService.FindById(id.Value);
+
+            if (seller == null)
+                return NotFound();
+
+            ICollection<Department> departments = _departmentService.FindAll();
+            
+            SellerFormViewModel sfm = new SellerFormViewModel { Seller = seller, Departments = departments };
+            
+            return View(sfm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, Seller seller)
+        {
+            if (id != seller.Id)
+                return BadRequest();
+
+            try
+            {
+                _sellerService.Update(seller);
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch(NotFoundException)
+            {
+                return BadRequest();
+            }
+            catch(DbConcurrencyException)
+            {
+                return BadRequest();
+            }
         }
     }
 }
